@@ -1,97 +1,256 @@
-import React, { Component } from 'react';
-import './App.css';
+import React from "react";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import {Table,Button,Container,Modal,ModalHeader,ModalBody,FormGroup,ModalFooter,
+} from "reactstrap";
 
-class App extends Component {
+const data = [
+ 
+];
 
-  constructor(props){
-    super(props);
-    this.state={
-      title: 'Application CRUD recipes',
-      act: 0,
-      index: '',
-      datas: []
-    }
-  } 
+class App extends React.Component {
+  state = {
+    data: data,
+    modalActualizar: false,
+    modalInsertar: false,
+    form: {
+      id: "",
+      recette: "",
+      ingrediant: "",
+    },
+  };
 
-  componentDidMount(){
-    this.refs.name.focus();
-  }
+  mostrarModalActualizar = (dato) => {
+    this.setState({
+      form: dato,
+      modalActualizar: true,
+    });
+  };
 
-  addRecipe = (e) =>{
-    e.preventDefault();
-    console.log('try');
+  cerrarModalActualizar = () => {
+    this.setState({ modalActualizar: false });
+  };
 
-    let datas = this.state.datas;
-    let name = this.refs.name.value;
-    let ingrèdients = this.refs.ingrèdients.value;
+  mostrarModalInsertar = () => {
+    this.setState({
+      modalInsertar: true,
+    });
+  };
 
-    if(this.state.act === 0){   //new
-      let data = {
-        name, ingrèdients
+  cerrarModalInsertar = () => {
+    this.setState({ modalInsertar: false });
+  };
+
+  editar = (dato) => {
+    var contador = 0;
+    var arreglo = this.state.data;
+    arreglo.map((registro) => {
+      if (dato.id == registro.id) {
+        arreglo[contador].recette = dato.recette;
+        arreglo[contador].ingrediant = dato.ingrediant;
       }
-      datas.push(data);
-    }else{                      //update
-      let index = this.state.index;
-      datas[index].name = name;
-      datas[index].ingrèdients = ingrèdients;
-    }    
-
-    this.setState({
-      datas: datas,
-      act: 0
+      contador++;
     });
+    this.setState({ data: arreglo, modalActualizar: false });
+  };
 
-    this.refs.myForm.reset();
-    this.refs.name.focus();
+  eliminar = (dato) => {
+    var opcion = window.confirm("Estás Seguro que deseas Eliminar el elemento "+dato.id);
+    if (opcion == true) {
+      var contador = 0;
+      var arreglo = this.state.data;
+      arreglo.map((registro) => {
+        if (dato.id == registro.id) {
+          arreglo.splice(contador, 1);
+        }
+        contador++;
+      });
+      this.setState({ data: arreglo, modalActualizar: false });
+    }
+  };
+
+  insertar= ()=>{
+    var valorNuevo= {...this.state.form};
+    valorNuevo.id=this.state.data.length+1;
+    var lista= this.state.data;
+    lista.push(valorNuevo);
+    this.setState({ modalInsertar: false, data: lista });
   }
 
-  deleteRecipe = (i) => {
-    let datas = this.state.datas;
-    datas.splice(i,1);
+  handleChange = (e) => {
     this.setState({
-      datas: datas
+      form: {
+        ...this.state.form,
+        [e.target.name]: e.target.value,
+      },
     });
-
-    this.refs.myForm.reset();
-    this.refs.name.focus();
-  }
-
-  editRecipe = (i) => {
-    let data = this.state.datas[i];
-    this.refs.name.value = data.name;
-    this.refs.ingrèdients.value = data.ingrèdients;
-
-    this.setState({
-      act: 1,
-      index: i
-    });
-
-    this.refs.name.focus();
-  }  
+  };
 
   render() {
-    let datas = this.state.datas;
+    
     return (
-      <div className="App">
-        <h2>{this.state.title}</h2>
-        <form ref="myForm" className="myForm">
-          <input type="text" ref="name" placeholder="recipe" className="formField" />
-          <textarea ref="ingrèdients" placeholder="ingredient1,ingredient2...." className="formField">
-          </textarea>
-          <button onClick={(e)=>this.addRecipe(e)} className="myButton">Add</button>
-        </form>
-        <pre>
-          {datas.map((data, i) =>
-            <li key={i} className="myList">
-              {i+1}. {data.name}: {data.ingrèdients}
-              <button onClick={()=>this.editRecipe(i)} className="myListButton1">Edit </button>
-              <button onClick={()=>this.deleteRecipe(i)} className="myListButton2">Delete </button>
-            </li>
-          )}
-        </pre>
-      </div>
+      <>
+        <Container>
+        <br />
+          <Button color="success" onClick={()=>this.mostrarModalInsertar()}>Créer une recette</Button>
+          <br />
+          <br />
+          <Table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Recette</th>
+                <th>Ingrédiant</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {this.state.data.map((dato) => (
+                <tr key={dato.id}>
+                  <td>{dato.id}</td>
+                  <td>{dato.recette}</td>
+                  <td>{dato.ingrediant}</td>
+                  <td>
+                    <Button
+                      color="primary"
+                      onClick={() => this.mostrarModalActualizar(dato)}
+                    >
+                      Editer
+                    </Button>{" "}
+                    <Button color="danger" onClick={()=> this.eliminar(dato)}>Supprimer</Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Container>
+
+        <Modal isOpen={this.state.modalActualizar}>
+          <ModalHeader>
+           <div><h3>Editar Registro</h3></div>
+          </ModalHeader>
+
+          <ModalBody>
+            <FormGroup>
+              <label>
+               Id:
+              </label>
+            
+              <input
+                className="form-control"
+                readOnly
+                type="text"
+                value={this.state.form.id}
+              />
+            </FormGroup>
+            
+            <FormGroup>
+              <label>
+                  Recette: 
+              </label>
+              <input
+                className="form-control"
+                name="recette"
+                type="text"
+                onChange={this.handleChange}
+                value={this.state.form.recette}
+              />
+            </FormGroup>
+            
+            <FormGroup>
+              <label>
+                Ingrediant 
+              </label>
+              <input
+                className="form-control"
+                name="anime"
+                type="text"
+                onChange={this.handleChange}
+                value={this.state.form.anime}
+              />
+            </FormGroup>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              color="primary"
+              onClick={() => this.editar(this.state.form)}
+            >
+              Editer
+            </Button>
+            <Button
+              color="danger"
+              onClick={() => this.cerrarModalActualizar()}
+            >
+              Retour
+            </Button>
+          </ModalFooter>
+        </Modal>
+
+
+
+        <Modal isOpen={this.state.modalInsertar}>
+          <ModalHeader>
+           <div><h3>Insérer la recette</h3></div>
+          </ModalHeader>
+
+          <ModalBody>
+            <FormGroup>
+              <label>
+                Id: 
+              </label>
+              
+              <input
+                className="form-control"
+                readOnly
+                type="text"
+                value={this.state.data.length+1}
+              />
+            </FormGroup>
+            
+            <FormGroup>
+              <label>
+                Recette : 
+              </label>
+              <input
+                className="form-control"
+                name="recette"
+                type="text"
+                onChange={this.handleChange}
+              />
+            </FormGroup>
+            
+            <FormGroup>
+              <label>
+                Ingrediant : 
+              </label>
+              <input
+                className="form-control"
+                name="anime"
+                type="text"
+                onChange={this.handleChange}
+              />
+            </FormGroup>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button
+              color="primary"
+              onClick={() => this.insertar()}
+            >
+              Insérer
+            </Button>
+            <Button
+              className="btn btn-danger"
+              onClick={() => this.cerrarModalInsertar()}
+            >
+              Retour
+            </Button>
+          </ModalFooter>
+        </Modal>
+      </>
     );
   }
 }
-
 export default App;
