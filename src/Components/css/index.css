@@ -1,0 +1,18 @@
+
+.wrapper{
+    text-align: center;
+    margin-top: 60px;
+    
+}
+.back{
+    /* background-image: url('https://w.wallhaven.cc/full/0q/wallhaven-0q7z9r.png'); */
+    background-image: url('https://w.wallhaven.cc/full/45/wallhaven-45xdd8.jpg');
+    /* background-image: url('https://w.wallhaven.cc/full/4l/wallhaven-4ljjg2.jpg'); */
+    /* background-image: url('https://w.wallhaven.cc/full/2e/wallhaven-2e8lwx.jpg'); */
+    /* background-image: url('https://w.wallhaven.cc/full/0p/wallhaven-0p728p.jpg'); */
+    /* background-image: url('https://w.wallhaven.cc/full/ym/wallhaven-ymmd3l.jpg'); */
+
+
+
+    padding-bottom: 50%
+}
